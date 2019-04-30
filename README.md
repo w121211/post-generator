@@ -1,0 +1,3 @@
+# post-generator
+
+generate post
