@@ -16,6 +16,8 @@
  * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/node/v8/index.d.ts
  */
 declare module 'sha.js' {
+  import { FormatInputPathObject } from 'path';
+
   export default function shaJs(algorithm: string): Hash;
 
   type Utf8AsciiLatin1Encoding = 'utf8' | 'ascii' | 'latin1';
@@ -32,3 +34,5 @@ declare module 'sha.js' {
     // tslint:enable:no-method-signature
   }
 }
+
+// declare module 'svgdom';
