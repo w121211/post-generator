@@ -51,7 +51,7 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "@svgdotjs/svg.js": "git+https://github.com/svgdotjs/svg.js.git",
+    "@svgdotjs/svg.js": "^3.0.12",
     "fontkit": "^1.8.0",
     "sha.js": "^2.4.11",
     "svgdom": "0.0.20"

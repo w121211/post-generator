@@ -6,7 +6,7 @@ interface FontMap {
   [key: string]: string[];
 }
 
-const fontFolder = '/Users/chi/work/rateapp/server/resource'
+const fontFolder = '/Users/chi/Documents/GitHub/post-generator/asset'
 
 const fontMap: FontMap = {
   "Arima_Madurai": [

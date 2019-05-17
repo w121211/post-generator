@@ -44,7 +44,7 @@ export async function main(): Promise<void> {
     const draw = makeCanvas(IMG_WIDTH, IMG_HEIGHT);
     stack.render(draw);
 
-    await svg2png(converter, draw.svg(), './output/train', `${i}.png`);
+    await svg2png(converter, draw.svg(), './output/images', `${i}.png`);
 
     const elems = stack.renderElements();
     for (let j in elems) {

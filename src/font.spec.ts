@@ -8,9 +8,11 @@ const { SVG, registerWindow, Matrix } = require('@svgdotjs/svg.js');
 registerWindow(window, window.document);
 const canvas = SVG(document.documentElement).size(128, 128);
 
+
+
 test('font', t => {
   const font = fontkit.openSync(
-    '/Users/chi/work/post-generator/asset/font_en/Alegreya/Alegreya-Black.ttf'
+    '/Users/chi/Documents/GitHub/post-generator/asset/font_en/Alegreya/Alegreya-Black.ttf'
   );
   const str = 'hello';
   const fontSize = 24;
