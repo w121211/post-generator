@@ -1,14 +1,16 @@
-import * as faker from 'faker/locale/en'
-import { IDiceable } from './base'
+import * as faker from 'faker/locale/en';
+import { Diceable } from './base';
 
-export class Color implements IDiceable {
-  constructor(private hex = '#000000') { }
+export class Color extends Diceable {
+  constructor(private hex: string | null = null) {
+    super();
+  }
 
   dice() {
-    this.hex = faker.internet.color()
+    this.hex = faker.internet.color();
   }
 
   getHex() {
-    return this.hex
+    return this.hex;
   }
 }

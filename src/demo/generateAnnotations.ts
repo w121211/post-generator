@@ -6,66 +6,9 @@ import { ComponentStack } from '../component/base';
 import { Font } from '../component/font';
 import { Color } from '../component/color';
 import { Text } from '../component/text';
+import { Rectangle } from '../component/shape';
 
-const IMG_WIDTH = 512;
-const IMG_HEIGHT = 512;
-const NUM_IMAGES = 10;
-
-// const CATEGORIES = [
-//   {
-//     id: 1,
-//     name: 'char'
-//   }
-// ];
-
-// let str = 'hello';
-// let svg = c.render(str);
-
-// let annotations = {
-//   svg,
-//   annSvgs: c.renderElements(str)
-// };
-
-// const comp = new Component();
-
-export async function main(): Promise<void> {
-  const converter = createConverter({
-    puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
-  });
-
-  for (let i = 0; i < NUM_IMAGES; i++) {
-    // const str = faker.lorem.word();
-    // const imSvg = comp.render(str);
-    const text = new Text(new Font(), new Color());
-    const stack = new ComponentStack([text], IMG_WIDTH, IMG_HEIGHT);
-
-    stack.dice();
-
-    const draw = makeCanvas(IMG_WIDTH, IMG_HEIGHT);
-    stack.render(draw);
-
-    await svg2png(converter, draw.svg(), './output/images', `${i}.png`);
-
-    const elems = stack.renderElements();
-    for (let j in elems) {
-      await svg2png(
-        converter,
-        elems[j]['svg'],
-        './output/annotations',
-        `${i}_${elems[j]['label'].toLowerCase()}_${j}.png`
-      );
-    }
-  }
-
-  await converter.destroy();
-}
-
-// main();
-
-// // fs.writeFileSync('annotations.json', JSON.stringify(annotations));
-// // svg2png(svg);
-
-export async function svg2png(
+async function svg2png(
   converter: Converter,
   svg: string,
   saveDir = './output',
@@ -118,4 +61,48 @@ export async function svg2png(
   // } finally {
   //   await converter.destroy()
   // }
+}
+
+export async function main(withAnnotations = true): Promise<void> {
+  const IMG_WIDTH = 512;
+  const IMG_HEIGHT = 512;
+  const NUM_IMAGES = 100;
+
+  // const rect0 = new Rectangle(new Color(), 0, 0, 512, 512);
+  // const rect1 = new Rectangle(new Color());
+  // const stack = new ComponentStack([rect0, rect1, text], IMG_WIDTH, IMG_HEIGHT);
+
+  const rect0 = new Rectangle(new Color(), 0, 0, 512, 512);
+  // const rect1 = new Rectangle(new Color());
+  // const rect2 = new Rectangle(new Color());
+  const text = new Text(new Font(), new Color());
+  const stack = new ComponentStack([rect0, text], 0, 0, IMG_WIDTH, IMG_HEIGHT);
+
+  const converter = createConverter({
+    puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+  });
+
+  for (let i = 0; i < NUM_IMAGES; i++) {
+    console.log(i);
+    stack.dice();
+
+    const draw = makeCanvas(IMG_WIDTH, IMG_HEIGHT);
+    stack.render(draw);
+
+    await svg2png(converter, draw.svg(), './output/images', `${i}_crowd.png`);
+
+    if (withAnnotations) {
+      const elems = stack.renderAnnotations();
+      for (let j in elems) {
+        await svg2png(
+          converter,
+          elems[j]['svg'],
+          './output/annotations',
+          `${i}_crowd_${elems[j]['label'].toLowerCase()}_${j}.png`
+        );
+      }
+    }
+  }
+
+  await converter.destroy();
 }
