@@ -15,4 +15,4 @@
 
 import { main } from './demo/generateAnnotations';
 
-main(true);
+main(false);

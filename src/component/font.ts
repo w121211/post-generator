@@ -1,4 +1,4 @@
-import { Diceable } from './base';
+import { Property } from './properties';
 import path from 'path';
 import fontkit, { IFont } from 'fontkit';
 
@@ -9,27 +9,29 @@ interface FontMap {
 const fontFolder = '/Users/chi/Documents/GitHub/post-generator/asset';
 
 const fontMap: FontMap = {
-  Arima_Madurai: [
-    'fonts_en/Arima_Madurai/ArimaMadurai-Thin.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-ExtraLight.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-Light.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-Regular.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-Medium.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-Bold.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-ExtraBold.ttf',
-    'fonts_en/Arima_Madurai/ArimaMadurai-Black.ttf'
-  ]
+  // Arima_Madurai: [
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Thin.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-ExtraLight.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Light.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Regular.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Medium.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Bold.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-ExtraBold.ttf',
+  //   'fonts_en/Arima_Madurai/ArimaMadurai-Black.ttf'
+  // ],
+  cwtex: ['fonts_cn/cwtex/cwTeXQFangsong-Medium.ttf']
 };
 
 // type FontName = keyof FONT_MAP
 
-export class Font extends Diceable {
+export class Font extends Property {
   public unitsPerEm: number | null = null;
   private _fontkit: IFont;
 
   constructor(
-    private name: keyof FontMap = 'Arima_Madurai',
-    private index: number = 0
+    private name: keyof FontMap = 'cwtex',
+    private index: number = 0,
+    public size: number = 16
   ) {
     super();
     const _path = path.join(fontFolder, fontMap[this.name][this.index]);

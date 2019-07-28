@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { createConverter, Converter } from 'convert-svg-to-png';
 import { makeCanvas } from '../common/svg';
-import { ComponentStack } from '../component/base';
+import { Group } from '../component/base';
 import { Font } from '../component/font';
-import { Color } from '../component/color';
-import { Text } from '../component/text';
+import { Color, Box } from '../component/properties';
+import { Text, TextBox } from '../component/text';
 import { Rectangle } from '../component/shape';
 
 async function svg2png(
@@ -66,17 +66,27 @@ async function svg2png(
 export async function main(withAnnotations = true): Promise<void> {
   const IMG_WIDTH = 512;
   const IMG_HEIGHT = 512;
-  const NUM_IMAGES = 100;
+  const NUM_IMAGES = 1;
 
   // const rect0 = new Rectangle(new Color(), 0, 0, 512, 512);
   // const rect1 = new Rectangle(new Color());
   // const stack = new ComponentStack([rect0, rect1, text], IMG_WIDTH, IMG_HEIGHT);
 
-  const rect0 = new Rectangle(new Color(), 0, 0, 512, 512);
+  const rect0 = new Rectangle(
+    new Color(),
+    new Box(0, 0, IMG_WIDTH, IMG_HEIGHT)
+  );
+  const rect1 = new Rectangle(
+    new Color(),
+    new Box(undefined, undefined, undefined, undefined)
+  );
   // const rect1 = new Rectangle(new Color());
   // const rect2 = new Rectangle(new Color());
-  const text = new Text(new Font(), new Color());
-  const stack = new ComponentStack([rect0, text], 0, 0, IMG_WIDTH, IMG_HEIGHT);
+  // const text = new TextBox(new Font(), new Color());
+  const group = new Group(
+    [rect0, rect1, new TextBox(new Text(), new Font(), new Color())],
+    new Box(0, 0, IMG_WIDTH, IMG_HEIGHT)
+  );
 
   const converter = createConverter({
     puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
@@ -84,15 +94,15 @@ export async function main(withAnnotations = true): Promise<void> {
 
   for (let i = 0; i < NUM_IMAGES; i++) {
     console.log(i);
-    stack.dice();
+    group.dice();
 
     const draw = makeCanvas(IMG_WIDTH, IMG_HEIGHT);
-    stack.render(draw);
+    group.render(draw);
 
     await svg2png(converter, draw.svg(), './output/images', `${i}_crowd.png`);
 
     if (withAnnotations) {
-      const elems = stack.renderAnnotations();
+      const elems = group.renderAnnotations();
       for (let j in elems) {
         await svg2png(
           converter,

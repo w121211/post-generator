@@ -3,16 +3,10 @@ import { Matrix, Container } from '@svgdotjs/svg.js';
 
 // import { makeCanvas } from '../common/svg'
 import { Component } from './base';
-import { Color } from './color';
+import { Color, Box } from './properties';
 
 export class Rectangle extends Component {
-  constructor(
-    private readonly color: Color,
-    public x: number | undefined = undefined,
-    public y: number | undefined = undefined,
-    public w: number | undefined = undefined,
-    public h: number | undefined = undefined
-  ) {
+  constructor(private readonly color: Color, public readonly box: Box) {
     super();
   }
 
@@ -27,8 +21,8 @@ export class Rectangle extends Component {
 
   render(draw: Container) {
     const g = draw.group();
-    g.rect(<number>this.w, <number>this.h)
-      .move(<number>this.x, <number>this.y)
+    g.rect(<number>this.box.w, <number>this.box.h)
+      .move(<number>this.box.x, <number>this.box.y)
       .fill(<string>this.color.getHex());
     return g;
   }
