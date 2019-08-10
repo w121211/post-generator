@@ -1,26 +1,36 @@
 import * as faker from 'faker/locale/en';
-import { IComponent } from './base';
+import { IComponent } from '../component/base';
 
 export interface IDiceable {
   // dice(ignoreProps?: string[]): void;
-  dice(curComponent: IComponent | null, ignoreProps: string[]): void;
+  dice(thisComp: IComponent | null, ignoreProps: string[]): void;
 }
 
 export abstract class Property implements IDiceable {
   protected _fixedProps: string[] | null = null;
 
-  protected _fixed(prop: string | string[]) {
+  public abstract dice(
+    thisComp: IComponent | null,
+    ignoreProps: string[]
+  ): void;
+
+  protected _fixed(prop: string | string[]): boolean {
     if (this._fixedProps === null) {
       this._fixedProps = [];
-      for (const k in this)
-        if (this[k] !== undefined && this[k] !== null) this._fixedProps.push(k);
+      for (const k in this) {
+        if (this[k] !== undefined && this[k] !== null) {
+          this._fixedProps.push(k);
+        }
+      }
     }
 
     if (typeof prop === 'string') {
       return this._fixedProps.includes(prop);
     } else {
       for (const p of prop) {
-        if (!this._fixedProps.includes(p)) return false;
+        if (!this._fixedProps.includes(p)) {
+          return false;
+        }
       }
       return true;
     }
@@ -36,8 +46,6 @@ export abstract class Property implements IDiceable {
   //     return false;
   //   }
   // }
-
-  abstract dice(curComponent: IComponent | null, ignoreProps: string[]): void;
 
   // dice(curComponent: IComponent | null = null, ignoreProps: string[] = []) {
   //   // todo: `ignoreProps` to avoid cyclic call of components
@@ -61,30 +69,44 @@ export class Box extends Property {
   private readonly _min_h = 10;
 
   constructor(
-    public x: number | null | undefined,
-    public y: number | null | undefined,
-    public w: number | null | undefined,
-    public h: number | null | undefined
+    public x?: number | null,
+    public y?: number | null,
+    public w?: number | null,
+    public h?: number | null
   ) {
     super();
   }
 
-  private _diceWH(comp: IComponent) {
+  public dice(curComponent: IComponent | null, ignoreProps: string[]): void {
+    // console.log('dice box');
+    if (curComponent === null) {
+      throw Error('Require current component to dice()');
+    }
+
+    if (this.w === undefined && this.h === undefined) {
+      this._diceWH(curComponent);
+    }
+    if (this.x === undefined && this.y === undefined) {
+      this._diceXY(curComponent);
+    }
+  }
+
+  private _diceWH(comp: IComponent): void {
     if (comp.parent) {
       this.w = faker.random.number({
         min: this._min_w,
-        max: <number>comp.parent.box.w
+        max: comp.parent.box.w as number
       });
       this.h = faker.random.number({
         min: this._min_h,
-        max: <number>comp.parent.box.h
+        max: comp.parent.box.h as number
       });
     } else {
       throw Error('Root component need to declare (width, height)');
     }
   }
 
-  private _diceXY(comp: IComponent) {
+  private _diceXY(comp: IComponent): void {
     if (comp.parent) {
       this.x = faker.random.number({
         min: 0,
@@ -97,19 +119,6 @@ export class Box extends Property {
     } else {
       this.x = faker.random.number({ min: 0, max: <number>this.w });
       this.y = faker.random.number({ min: 0, max: <number>this.h });
-    }
-  }
-
-  dice(curComponent: IComponent | null, ignoreProps: string[]) {
-    console.log('dice box');
-    if (curComponent === null)
-      throw Error('Require current component to dice()');
-
-    if (this.w === undefined && this.h === undefined) {
-      this._diceWH(curComponent);
-    }
-    if (this.x === undefined && this.y === undefined) {
-      this._diceXY(curComponent);
     }
   }
 
@@ -132,15 +141,11 @@ export class Box extends Property {
 }
 
 export class Color extends Property {
-  constructor(private hex: string | null = null) {
+  constructor(public hex?: string | null) {
     super();
   }
 
-  dice() {
+  public dice(): void {
     this.hex = faker.internet.color();
-  }
-
-  getHex() {
-    return this.hex;
   }
 }

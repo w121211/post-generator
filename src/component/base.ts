@@ -1,42 +1,59 @@
 import { Container } from '@svgdotjs/svg.js';
-import * as faker from 'faker/locale/en';
 import { makeCanvas } from '../common/svg';
-import { IDiceable, Property, Box } from './properties';
+import { Box, IDiceable, Property } from '../property/base';
 
-// ---------------------------------------------------
-// Component
-// ---------------------------------------------------
+export interface IAnnotation {
+  svg: string;
+  label: string;
+}
 
 export interface IComponent {
   root: IComponent;
   parent: IComponent | null;
   box: Box;
-  // x: number | undefined | null;
-  // y: number | undefined | null;
-  // w: number | undefined | null;
-  // h: number | undefined | null;
-  renderAnnotations(): { svg: string; label: string }[];
-  render(draw: Container): Container;
+  render(
+    draw: Container,
+    annMode: boolean,
+    annComp?: Component
+  ): Container | void;
+  renderAnnotations(
+    rootRenderFn: (annComp: IComponent) => Container
+  ): IAnnotation[];
 }
 
 export abstract class Component implements IComponent, IDiceable {
-  abstract render(draw: Container): Container;
+  [key: string]: any;
+  public root: Component = this;
+  public parent: Component | null = null;
+  public box: Box = new Box();
 
-  public root: IComponent = this;
-  public parent: IComponent | null = null;
-  public box: Box = new Box(undefined, undefined, undefined, undefined);
+  public abstract render(
+    draw: Container,
+    annMode: boolean,
+    annComp?: Component
+  ): Container | void;
 
-  protected _setRoot(comp: IComponent, root: IComponent) {
-    comp.root = root;
-    if (comp instanceof ComponentGroup) {
-      for (const _comp of comp.components) this._setRoot(_comp, root);
-    }
+  public renderAnnotations(
+    rootRenderFn: (annComp: Component) => Container
+  ): IAnnotation[] {
+    const draw = rootRenderFn(this);
+    return [{ svg: draw.svg(), label: this.constructor.name }];
   }
 
-  dice(curComponent: IComponent | null = this, ignoreProps: string[] = []) {
+  // protected _setRoot(comp: IComponent, root: IComponent) {
+  //   comp.root = root;
+  //   if (comp instanceof ComponentGroup) {
+  //     for (const _comp of comp.components) this._setRoot(_comp, root);
+  //   }
+  // }
+
+  public dice(
+    thisComp: IComponent | null = this,
+    ignoreProps: string[] = []
+  ): void {
     // TODO: `ignoreProps` to avoid cyclic call of components
-    for (const _prop in this) {
-      const prop = this[_prop];
+    for (const k of Object.keys(this)) {
+      const prop = this[k];
       if (prop instanceof Property) {
         prop.dice(this, []);
       }
@@ -52,13 +69,16 @@ export abstract class Component implements IComponent, IDiceable {
     // }
   }
 
-  renderAnnotations(): { svg: string; label: string }[] {
-    const draw = makeCanvas(<number>this.root.box.w, <number>this.root.box.h);
-    this.render(draw);
-    return [{ svg: draw.svg(), label: this.constructor.name }];
-  }
+  // public renderAnnotations(): IAnnotation[] {
+  //   const draw = makeCanvas(
+  //     this.root.box.w as number,
+  //     this.root.box.h as number
+  //   );
+  //   this.render(draw);
+  //   return [{ svg: draw.svg(), label: this.constructor.name }];
+  // }
 
-  private _getRootComponent() {
+  private _getRootComponent(): void {
     let count = 0;
     let _root: IComponent = this;
     while (true) {
@@ -68,75 +88,3 @@ export abstract class Component implements IComponent, IDiceable {
     }
   }
 }
-
-// ---------------------------------------------------
-// Component group and support for aligning components
-// ---------------------------------------------------
-
-type AlignConfig = {
-  direction: number;
-  anchor: number;
-  gap: number | null;
-};
-
-interface IAlignable {
-  components: IComponent[];
-  alignConfig: AlignConfig | null;
-  align(): void;
-}
-
-export abstract class ComponentGroup extends Component implements IAlignable {
-  constructor(
-    // public readonly components: Array<{ new (): Component }>,
-    public readonly components: Component[],
-    public box: Box = new Box(0, 0, null, null),
-    public alignConfig: AlignConfig = {
-      direction: 0, // 0: top-to-bottom, 1: left-to-right
-      anchor: 0, // TODO
-      gap: 0 // in pixel, or null for average expand
-    }
-  ) {
-    super();
-    for (let c of components) c.parent = this;
-    this._setRoot(this, this.root);
-  }
-
-  render(draw: Container) {
-    const g = draw.group();
-    for (let comp of this.components) {
-      comp.render(g);
-    }
-    return g;
-  }
-
-  renderAnnotations(): { svg: string; label: string }[] {
-    let anns: { svg: string; label: string }[] = [];
-    for (const comp of this.components) {
-      const _anns = comp.renderAnnotations();
-      anns = [...anns, ..._anns];
-    }
-    return anns;
-  }
-
-  dice() {
-    for (const comp of this.components) {
-      comp.dice();
-      // comp.dice();
-    }
-  }
-
-  // align
-
-  _diceAlign() {}
-
-  align(): void {
-    const config = this.alignConfig;
-    if (config == null) return;
-
-    if (config.gap == null) {
-    } else {
-    }
-  }
-}
-
-export class Group extends ComponentGroup {}

@@ -1,29 +1,32 @@
-import * as faker from 'faker/locale/en';
-import { Matrix, Container } from '@svgdotjs/svg.js';
+import { Container } from '@svgdotjs/svg.js';
 
 // import { makeCanvas } from '../common/svg'
-import { Component } from './base';
-import { Color, Box } from './properties';
+import { Box, Color } from '../property/base';
+import { Component, IAnnotation } from './base';
 
 export class Rectangle extends Component {
-  constructor(private readonly color: Color, public readonly box: Box) {
+  constructor(
+    public readonly box: Box = new Box(),
+    public readonly color: Color = new Color()
+  ) {
     super();
   }
 
-  // dice() {
-  //   this._str = faker.lorem.sentence();
-  //   this._fontSize = faker.random.number({
-  //     min: this.MIN_FONT_SIZE,
-  //     max: this.MAX_FONT_SIZE
-  //   });
-  //   super.dice();
-  // }
-
-  render(draw: Container) {
+  public render(
+    draw: Container,
+    annMode: boolean = false,
+    annComp?: Component
+  ): Container {
     const g = draw.group();
-    g.rect(<number>this.box.w, <number>this.box.h)
-      .move(<number>this.box.x, <number>this.box.y)
-      .fill(<string>this.color.getHex());
+    const rect = g.rect(this.box.w as number, this.box.h as number);
+    rect.move(this.box.x as number, this.box.y as number);
+
+    // use trick 'as unknown' to avoid typescript warning
+    if (annMode && (annComp as unknown) !== this) {
+      rect.fill('none');
+    } else {
+      rect.fill(this.color.hex as string);
+    }
     return g;
   }
 }

@@ -1,4 +1,4 @@
-import { Property } from './properties';
+import { Property } from './base';
 import path from 'path';
 import fontkit, { IFont } from 'fontkit';
 
@@ -25,7 +25,8 @@ const fontMap: FontMap = {
 // type FontName = keyof FONT_MAP
 
 export class Font extends Property {
-  public unitsPerEm: number | null = null;
+  public unitsPerEm: number;
+  public scale: number;
   private _fontkit: IFont;
 
   constructor(
@@ -37,6 +38,7 @@ export class Font extends Property {
     const _path = path.join(fontFolder, fontMap[this.name][this.index]);
     this._fontkit = fontkit.openSync(_path);
     this.unitsPerEm = this._fontkit.unitsPerEm;
+    this.scale = size / this.unitsPerEm;
   }
 
   dice() {

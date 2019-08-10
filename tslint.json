@@ -1,6 +1,6 @@
 {
   // "extends": ["tslint:latest", "tslint-config-prettier", "tslint-immutable"],
-  "extends": ["slint:recommended", "tslint-config-prettier"],
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
   "rules": {
     "interface-over-type-literal": false,
     // "interface-name": [true, "never-prefix"],
@@ -12,7 +12,7 @@
     // Recommended built-in rules
     "no-var-keyword": true,
     "no-parameter-reassignment": true,
-    "typedef": [true, "call-signature"]
+    "typedef": [true, "call-signature"],
 
     // Immutability rules
     // "readonly-keyword": true,
@@ -32,5 +32,14 @@
     // ],
     // "no-if-statement": true
     /* end tslint-immutable rules */
+
+    // custom
+    "max-classes-per-file": false,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ]
   }
 }

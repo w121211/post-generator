@@ -1,18 +1,38 @@
 import test from 'ava';
 import * as faker from 'faker/locale/zh_CN';
 import { makeCanvas } from '../common/svg';
-import { Font } from './font';
-import { Color } from './properties';
+import { Font } from '../property/font';
+import { Color } from '../property/base';
 import { IComponent } from './base';
-import { Property, Box } from './properties';
+import { Property, Box } from '../property/base';
 
-function align(components: IComponent[]) {}
+import sizeOf from 'image-size';
 
-test('faker', t => {
-  const b = new Box(0, 0, 100, 100);
+import * as globby from 'globby';
 
-  t.is(b instanceof Property, true);
-  t.is(b instanceof Property, false);
+test('globby', t => {
+  const PHOTO_DIR =
+    '/users/chi/documents/github/coordconv-pytorch/data/facebook';
+  const PHOTO_EXTENSIONS = ['png', 'jpg', 'jpeg'];
+  const photoPaths = globby.sync(`${PHOTO_DIR}`, {
+    expandDirectories: {
+      files: ['*'],
+      extensions: PHOTO_EXTENSIONS
+    }
+  });
+  // const photoPaths = ['string'];
+
+  // t.deepEqual(photoPaths, ['aaa']);
+
+  t.deepEqual(
+    sizeOf(
+      '/users/chi/documents/github/coordconv-pytorch/data/facebook/922117_706117639414548_2002491177_o.jpg'
+    ),
+    {}
+  );
+
+  // t.is(b instanceof Property, true);
+  // t.is(b instanceof Property, false);
 });
 
 // test('text', t => {
